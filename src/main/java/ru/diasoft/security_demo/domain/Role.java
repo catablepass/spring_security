@@ -1,12 +1,25 @@
 package ru.diasoft.security_demo.domain;
 
+import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 
-public enum Role implements GrantedAuthority {
-    USER;
+import javax.persistence.*;
+import java.util.Set;
+
+@Data
+@Entity
+@Table(name = "roles")
+public class Role implements GrantedAuthority {
+    @Id
+    @GeneratedValue
+    private Long id;
+    private String name;
+    @Transient
+    @ManyToMany(mappedBy = "roles")
+    private Set<User> users;
 
     @Override
     public String getAuthority() {
-        return name();
+        return getName();
     }
 }

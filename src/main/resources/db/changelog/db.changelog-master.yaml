@@ -1,0 +1,177 @@
+databaseChangeLog:
+  - logicalFilePath: db/changelog/db.changelog-master.yaml
+  - changeSet:
+      id: 1
+      author: asavelev
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: username
+                  type: varchar(50)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: password
+                  type: varchar(512)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_account_non_expired
+                  type: boolean
+                  constraints:
+                    nullable: false
+                  defaultValue: true
+              - column:
+                  name: is_account_non_locked
+                  type: boolean
+                  constraints:
+                    nullable: false
+                  defaultValue: true
+              - column:
+                  name: is_credentials_non_expired
+                  type: boolean
+                  constraints:
+                    nullable: false
+                  defaultValue: true
+              - column:
+                  name: is_enabled
+                  type: boolean
+                  constraints:
+                    nullable: false
+                  defaultValue: true
+  - changeSet:
+      id: 2
+      author: asavelev
+      changes:
+        - createTable:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(50)
+                  constraints:
+                    unique: true
+                    nullable: false
+  - changeSet:
+      id: 3
+      author: asavelev
+      changes:
+        - createTable:
+            tableName: users_authorities
+            columns:
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: authorities_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 4
+      author: asavelev
+      comment: "Create users"
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: username
+                  value: "admin"
+              - column:
+                  name: password
+                  value: "$2a$10$7MsHKCuPTT18fF4vxH73b.MUuCdzyDzRJb2FqHoH00i6dfLTqTvnm" #admin
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: username
+                  value: "user"
+              - column:
+                  name: password
+                  value: "$2a$10$H9xH8BSz64aMiN5pTAATCuWbBqiHKsyHNsfVlN4ChGLYDEWfMtLtC" #123456
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: username
+                  value: "locked"
+              - column:
+                  name: password
+                  value: "$2a$10$EiDoN6ah.GUb6ZXO0YRLXePvxJgUL.cxPrroW7u6D.8y260y00UUa" #123456
+              - column:
+                  name: is_account_non_locked
+                  value: false
+      rollback:
+        - delete:
+            tableName: users
+            where: username in ('admin', 'user', 'locked')
+  - changeSet:
+      id: 5
+      author: asavelev
+      comment: "Create roles"
+      changes:
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: name
+                  value: "ROLE_USER"
+      rollback:
+        - delete:
+            tableName: roles
+            where: name in ('ROLE_USER')
+  - changeSet:
+      id: 6
+      author: asavelev
+      comment: "Create links"
+      changes:
+        - insert:
+            tableName: users_authorities
+            columns:
+              - column:
+                  name: user_id
+                  value: 1
+              - column:
+                  name: authorities_id
+                  value: 1
+        - insert:
+            tableName: users_authorities
+            columns:
+              - column:
+                  name: user_id
+                  value: 2
+              - column:
+                  name: authorities_id
+                  value: 2
+        - insert:
+            tableName: users_authorities
+            columns:
+              - column:
+                  name: user_id
+                  value: 3
+              - column:
+                  name: authorities_id
+                  value: 3
+      rollback:
+        - delete:
+            tableName: users_authorities
